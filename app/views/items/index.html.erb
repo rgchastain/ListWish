@@ -1,0 +1,61 @@
+<h2><% if @user == current_user %>Hello,<% end %> <%= @user.first_name %></h2>
+
+<p>Items in your wish list:</p>
+<table>
+	<tr>
+		<th>Item Name</th>
+		<th>Price</th>
+		<th>Action/Status</th>
+	</tr>
+	<% @users_wishes.each do |item| %>
+	<tr>
+		<td><a href="/items/<%= item.id %>"><%= item.name %></a></td>
+		<td><%= item.price %></td>
+		<td>
+			<% if item.user == current_user %>
+				<a href="/items/<%= item.id %>" data-method="delete">Delete</a> | <a href="/items/<%= item.id %>/edit">Edit</a>
+			<% else %>
+				<% if item.wishers.include? current_user %>
+					<form action="/items/<%= item.id %>/remove" method="post">
+                		<input type="hidden" name="_method" value="delete" />
+                		<input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>" />
+            			<button  type="submit" value="Remove">Remove</button>
+            		</form>
+            	<% end %>
+            <% end %>
+		</td>
+	</tr>
+	<% end %>
+</table>
+
+<p>Items not in your wish list:</p>
+<table>
+	<tr>
+		<th>Item Name</th>
+		<th>Price</th>
+		<th>Action/Status</th>
+	</tr>
+	<% @other_wishes.each do |item| %>
+	<tr>
+		<td><a href="/items/<%= item.id %>"><%= item.name %></a></td>
+		<td><%= item.price %></td>
+		<td>
+            <form action="/items/<%= item.id %>/add" method="post">
+				<input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>" />
+				<button  type="submit" value="Add">Add</button>
+			</form>
+		</td>
+	</tr>
+	<% end %>
+</table>
+
+<form action="/items" method="post">
+	<input type="hidden" name="authenticity_token" class="<%=form_authenticity_token%>">
+
+	<p>Item Name: <input type="text" name="item[name]"></p>
+
+	<p>Price: <input type="number" name="item[price]"></p>
+
+	<p><button type="submit">Add Item</button></p>
+	
+</form>
